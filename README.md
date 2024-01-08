@@ -7,25 +7,13 @@ It fetches an image URL from the database, and uses `gsettings` to set the wallp
 
 ## Setup
 
-#### Clone REPO
+#### Clone and build
 ``` bash
 git clone https://github.com/Svenlaa/wallpaper
 cd wallpaper
-cp constants.example constants.go
+go build
 ```
-
-#### ENV and Database
-
-Set your own `DATABASE_URL` in `constants.go` \
-Run the sql query in the `migrations/` folder
 
 #### Add your own wallpapers
-Execute SQL commands \
-`INSERT INTO wallpapers (url, comment) VALUES (?, ?);`
-
-#### Build and execute
-
-``` bash
-go build
-./wallpaper
-```
+Add images to the `~/Pictures/Wallpapers` folder. \
+You might need to create the folder yourself.
