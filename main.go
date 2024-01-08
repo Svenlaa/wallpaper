@@ -1,25 +1,22 @@
 package main
 
 import (
-	"database/sql"
+	"math/rand"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
-
-	_ "github.com/go-sql-driver/mysql"
 )
 
 func main() {
-	db, err := sql.Open("mysql", DATABASE_URL)
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-	currentWallpaper := getWallpaper()
+	dir := getWallpaperDirectory()
+	currentWallpaper := getCurrentWallpaper()
 
 	var url string;
 	attempts := 0
 	for {
-		db.QueryRow("SELECT url FROM wallpapers ORDER BY RAND()").Scan(&url)
+		attempts++;
+		url = "file://" + pickFile(dir)
 		if url != currentWallpaper || attempts >= 3 {
 			break
 		}
@@ -27,7 +24,32 @@ func main() {
 	setWallpaper(url)
 }
 
-func getWallpaper () string {
+func pickFile(dir string) string {
+	files, err := os.ReadDir(dir)
+	if err != nil {
+		panic(err)
+	}
+	if len(files) == 0 {
+		panic("No files found.")
+	}
+	return filepath.Join(dir, files[rand.Intn(len(files))].Name())
+}
+
+func getWallpaperDirectory() string {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		panic(err)
+	}
+	wallpaperDir := filepath.Join(homeDir, "Pictures", "Wallpapers")
+	wallpaperDir, err = filepath.Abs(wallpaperDir)
+	if err != nil {
+		panic(err)
+	}
+
+	return wallpaperDir
+}
+
+func getCurrentWallpaper () string {
 	schema := "org.gnome.desktop.background"
 	key := "picture-uri"
 
